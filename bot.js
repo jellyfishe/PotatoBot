@@ -1,11 +1,20 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
 const config = require('./config.json');
+const client = new Discord.Client();
+const ytdl = require('ytdl-core');
 
-var createCharaRegex = /^(Create new character)\s<(.*)>\s(<\w+>)\s(<\w+>)\s(?:\s|(strength)|(dexterity)|(constitution)|(intelligence)|(wisdom)|(charisma)){11}$/;
+var musicQueue = [];
+var voiceChannel = null;
+const streamOptions = {seek: 0, volume: 1};
 
 //Functions
 function isCommand(msg){return msg.content.startsWith(config.prefix) && !msg.author.bot}
+
+function GetChannelByName(name) {
+    var channel = client.channels.find(val => val.name === name);
+
+    return channel;
+}
 //End Functions
 
 client.on('ready', () => {
@@ -21,22 +30,45 @@ client.on('message', msg => {
         
         if(command === 'ping') msg.channel.sendMessage('pong');
         
+        // Music Commands
         if(command.startsWith('music')){
-            var mCommand = command.split(' ')[1];
-            const voiceChannel = msg.guild.channels.filter(g => {
-                return g.type == 'voice' && g.name == 'General';
-                }).first();
             
+            var mCommand = command.split(' ')[1];
             if(mCommand === 'summon'){
-                voiceChannel.join().then(connection => console.log('Connected voice channel!')).catch(console.error);
+                if(voiceChannel){return;}
+                
+                voiceChannel = GetChannelByName('General');
+                voiceChannel.join().then(connection => console.log('Connected to voice channel!')).catch(console.error);
             }
         
             if(mCommand === 'dismiss'){
-                if(voiceChannel.connection){
+                if(voiceChannel){
                     voiceChannel.leave();
-                    console.log('Disconnected voice channel!');
+                    voiceChannel = null;
+                    console.log('Disconnected from voice channel!');
+                    
+                }else{
+                    msg.channel.sendMessage('Nothing to disconnect from');
                 }
                     
+            }
+            
+            if(mCommand === 'play'){
+                if(voiceChannel){
+                    if(musicQueue.length != 0){
+                        msg.channel.sendMessage('Playing song');
+                        const stream = ytdl('https://www.youtube.com/watch?v=JY5NVzHtA5o', {filter : 'audioonly'});
+                        const dispatcher = client.voiceConnections.first().playStream(stream, streamOptions);
+                    }else{
+                        msg.channel.sendMessage('There is nothing queued to play.');
+                    }
+                }else{
+                    msg.channel.sendMessage('I am not in a voice channel at the moment.');
+                }
+            }
+            
+            if(mCommand === 'queue'){
+                musicQueue.push('Object 1');
             }
         }
         
