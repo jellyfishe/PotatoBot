@@ -16,9 +16,7 @@ var T = new Twit({
     
 });
 
-// My Twitter userid: 3250234778
-// MCSS userid: 112249727
-var stream = T.stream('statuses/filter', { follow: ['3250234778'] });
+var stream = T.stream('statuses/filter', { follow: [config.my_user_id] });
 stream.on('connect', function(request){
     console.log("Connecting to Twitter...");
 })
