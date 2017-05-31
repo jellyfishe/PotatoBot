@@ -19,6 +19,7 @@
   "dependencies": {
     "discord.js": "^11.0.0",
     "node-opus": "^0.2.6",
+    "twit": "^2.2.5",
     "ytdl-core": "^0.7.24"
   }
 }
