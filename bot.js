@@ -60,7 +60,6 @@ let responseList = {
     "cs_meme": cs_meme()
 };
 
-var playRegex = /^(play)\s(.*)$/;
 var youtubeURLRegex = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
 
 client.on('ready', () => {
@@ -78,6 +77,7 @@ client.on('message', msg => {
     if(command === 'hello') msg.channel.send({embed: createEmbed("testing")});
 
     var commandArgs = command.split(' ');
+    
     // Music Commands
     if(command.startsWith('music')){
         
@@ -90,21 +90,17 @@ client.on('message', msg => {
                     msg.channel.send('Playing song');
                     const stream = ytdl(musicQueue.shift(), {filter : 'audioonly'});
                     const dispatcher = client.voiceConnections.first().playStream(stream, streamOptions);
-                }else{
-                    msg.channel.send('There is nothing queued to play.');
-                }
-            }else{
-                msg.channel.send('I am not in a voice channel at the moment.');
-            }
+                    
+                }else msg.channel.send('There is nothing queued to play.');
+            }else msg.channel.send('I am not in a voice channel at the moment.');
         }
 
         if(commandArgs[1] === 'queue'){
             if(commandArgs.length > 2 && commandArgs[2].match(youtubeURLRegex)){
                 musicQueue.push(commandArgs[2]);
                 msg.channel.send('Song added to queue');
-            }else {
-                msg.channel.send('Invalid or no Youtube URL specified.');
-            }
+                
+            }else msg.channel.send('Invalid or no Youtube URL specified.');
             
         }
         
